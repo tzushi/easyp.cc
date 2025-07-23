@@ -34,6 +34,7 @@
 					<li><a href="#sec01">MESSAGE</a></li>
 					<li><a href="#sec03">SERVICE</a></li>
 					<li><a href="#sec04">MEMBERS</a></li>
+					<li><a href="#note">NOTE</a></li>
 					<li><a href="#sec05">COMPANY</a></li>
 				</ul>
 			</div>
@@ -144,8 +145,63 @@
 	</div>
 </section>
 
-<div class="nc-line"></div>
 
+<!-- NOTE-->
+<section id="note">
+	<header>
+		<h2><span>Note</span></h2>
+	</header>
+	<div class="innerS">
+		    <div id="note-feed"></div>
+
+    <script>
+  async function loadNoteRSS() {
+    const feedUrl = "https://note.com/easyp/rss"; // ← あなたのnote RSSに変更してください
+    const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(feedUrl);
+
+    try {
+      const response = await fetch(proxyUrl);
+      const data = await response.json();
+
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(data.contents, "application/xml");
+      const items = xml.querySelectorAll("item");
+
+      const container = document.getElementById("note-feed");
+      container.innerHTML = "<ul>";
+
+      items.forEach((item, index) => {
+        if (index >= 5) return; // 最新5件だけ表示（必要に応じて変更可）
+
+        const title = item.querySelector("title").textContent;
+        const link = item.querySelector("link").textContent;
+        const pubDate = new Date(item.querySelector("pubDate").textContent);
+
+        const formattedDate = pubDate.toLocaleDateString("ja-JP", {
+          year: "numeric", month: "short", day: "numeric"
+        });
+
+        container.innerHTML += `
+          <li>
+            <span>${formattedDate} - </span>
+            <a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>
+          </li>
+        `;
+      });
+
+      container.innerHTML += "</ul>";
+    } catch (error) {
+      console.error("RSS読み込みエラー:", error);
+      document.getElementById("note-feed").innerText = "記事の読み込みに失敗しました。";
+    }
+  }
+
+  loadNoteRSS();
+</script>
+	</div>
+</section>
+
+<div class="nc-line"></div>
 
 <!-- COMPANY -->
 <section id="sec05">
